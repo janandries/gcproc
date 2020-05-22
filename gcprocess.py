@@ -49,6 +49,7 @@ class gcp:
 
 		lines = self.file.readlines()
 		self.current_line_nr = 0
+		self.current_layer_index = 0
 		for line in lines:
 			self.current_line_nr += 1
 			#IGNORE ANY LINES THAT WE DON'T WANT
@@ -83,13 +84,13 @@ class gcp:
 					#something is wrong here?
 					print(f"[Line {self.current_line_nr}] ERROR: line after line before ';LAYER:' is not ;TIME_ELAPSED: but {line.strip()}")
 				if not line.startswith(';LAYER:0'): #for all except the first layer, we add a string:
-					print(f"[Line {self.current_line_nr}] Found {line.strip()}, prepending homing&pausing and appending previous G-code command")
-					self.proc_text.append(line)  #the TIME_ELAPSED line we are processing now
-					self.proc_text.append("""
+					self.current_layer_index += 1
+					print(f"[Line {self.current_line_nr}] Found {line.strip()}, prepending homing&pausing and appending previous G-code command ({last_g_code_command.strip()}")
+					self.proc_text.append(f"""
 G28 X ;Home
 G28 Y
-G0 F6000 X0 Y0 Z6
-G4 P30000 ;pause 30s""")
+G0 F6000 X0 Y0 Z{self.current_layer_index * self.layer_height}
+G4 P30000 ;pause 30s\n""")
 					self.proc_text.append(last_g_code_command)
 
 					self.c_home_pause_after_layer += 1
