@@ -9,6 +9,7 @@ class gcp:
 		self.c_home_pause_after_layer = 0
 		self.c_z_after_mesh = 0
 		self.c_lines_left_alone = 0
+		self.c_valve_stop = 0
 		
 	def load_file(self, filename):
 		self.input_filename = filename
@@ -28,7 +29,8 @@ class gcp:
 		print(f"Home&pause after layer: {self.c_home_pause_after_layer}")
 		print(f"Z commands after ;MESH: removed: {self.c_z_after_mesh}")
 		print(f"Lines left alone: {self.c_lines_left_alone}")
-		print()
+		print(f"Valve close commands: {self.c_valve_stop}")
+		if (self.c_valve_stop == 0): print("!ERROR! No valve stop command added to end")
 		print("===========================================================")
 
 	def save_to_file(self, filename):
@@ -36,16 +38,17 @@ class gcp:
 			for line in self.proc_text:
 				f.write("%s" % line)
 
-	def process(self, frequency, duty_cycle, layer_height):
+	def process(self, frequency, duty_cycle, layer_height, wait_time):
 		self.valve_frequency = frequency
 		self.valve_duty_cycle = duty_cycle
 		self.layer_height = layer_height
+		self.wait_time = wait_time
 
 		previous_line = ''
 
 		print("Start processing with freq: {frequency:.0f}, duty_cycle: {duty_cycle:.1f}, layer_height: {layer_height:.0f}")
 		#ignore commands:
-		ignore_list = ('M104', 'M105', 'M107', 'M109', 'G92 E0')
+		ignore_list = ('M104', 'M105', 'M107', 'M109')
 
 		lines = self.file.readlines()
 		self.current_line_nr = 0
@@ -58,9 +61,10 @@ class gcp:
 				
 				if line.startswith('M'):
 					self.c_M10X_ignored += 1
-				elif line.startswith('G92'):
-					self.c_G92_ignored += 1
-
+				elif line.startswith('G92'): #to remove
+					#self.c_G92_ignored += 1
+					self.proc_text.append(line)
+				
 				previous_line = line
 				continue
 
@@ -68,7 +72,7 @@ class gcp:
 			if line.startswith(';LAYER_COUNT:'):
 				print(f"[Line {self.current_line_nr}] Appending initial settings after {line.strip()}")
 				self.proc_text.append(line)
-				self.proc_text.append(self.get_initial_settings_string(50,0.5))
+				self.proc_text.append(self.get_initial_settings_string(self.valve_frequency,self.valve_duty_cycle))
 				
 				self.c_init_settings_added += 1
 
@@ -77,23 +81,27 @@ class gcp:
 
 			#ADD HOMING AND PAUSE AFTER EACH LAYER
 			if line.startswith(';LAYER:'):
-				#recall the last string
-				last_g_code_command = self.proc_text[-2]
+				self.current_layer_index += 1
+				
 				time_elapse = self.proc_text[-1]
 				if not time_elapse.startswith(';TIME_ELAPSED:'):
 					#something is wrong here?
 					print(f"[Line {self.current_line_nr}] ERROR: line after line before ';LAYER:' is not ;TIME_ELAPSED: but {line.strip()}")
-				if not line.startswith(';LAYER:0'): #for all except the first layer, we add a string:
-					self.current_layer_index += 1
-					print(f"[Line {self.current_line_nr}] Found {line.strip()}, prepending homing&pausing and appending previous G-code command ({last_g_code_command.strip()}")
-					self.proc_text.append(f"""
-G28 X ;Home
-G28 Y
-G0 F6000 X0 Y0 Z{self.current_layer_index * self.layer_height}
-G4 P30000 ;pause 30s\n""")
-					self.proc_text.append(last_g_code_command)
+				print(f"[Line {self.current_line_nr}] Found {line.strip()}, prepending homing&pausing")
+				self.proc_text.append(f"""
+;deposit one layer of 4 mm
+G1 F7200 Y365   ; move Y axis out of the way
+M577 E1 S0; wait for endstop_1 turn low\n
 
-					self.c_home_pause_after_layer += 1
+G91       ;enable relative motion
+G1 Z4.0   ;move bed down
+
+G90       ;absolute positioning
+G1 F3000 U350   ;deposit material
+G1 F3000 U0     ;scrape and return
+""")
+
+				self.c_home_pause_after_layer += 1
 
 				self.proc_text.append(line)
 
@@ -101,7 +109,7 @@ G4 P30000 ;pause 30s\n""")
 				continue
 
 			#remove Z value from command after ';MESH:'
-			if previous_line.startswith(';MESH:'):
+			if previous_line.startswith(';MESH:NONMESH'):
 				#find the a Z occurance
 				pos = line.find(' Z')
 				if pos != -1:
@@ -113,8 +121,15 @@ G4 P30000 ;pause 30s\n""")
 				previous_line = line
 				continue
 
-			#TODO: stop the valve at the end of the program
-				#"M42 P21 S0;stop the valve"
+			#stop the valve at the end of the program
+			if line.startswith(';M104 S0'): # ';M104 S0' somehow is always used at the end before homing'
+				self.proc_text.append(line)
+				self.proc_text.append("M42 P21 S0;stop the valve\n")
+				self.c_valve_stop += 1
+
+				previous_line = line
+				continue
+
 
 			#In all other cases we just add the line
 			self.proc_text.append(line)
@@ -126,8 +141,8 @@ G4 P30000 ;pause 30s\n""")
 
 
 	def get_initial_settings_string(self, frequency, duty_cycle):
-		string = f"""M563 P1 D0 ;H0 ; tool 1 uses extruder 0, heater 0 (and fan 0)
-f"T1 ;select tool 1
+		string = f"""M563 P1 D1 ;H0 ; tool 1 uses extruder 0, heater 0 (and fan 0)
+T1 ;select tool 1
 M302 P1 ;enable the cold extrusion
 
 M106 P1 I-1 ;disable FAN1 signal
