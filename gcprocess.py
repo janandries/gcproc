@@ -38,11 +38,10 @@ class gcp:
 			for line in self.proc_text:
 				f.write("%s" % line)
 
-	def process(self, frequency, duty_cycle, layer_height, wait_time):
+	def process(self, frequency, duty_cycle, layer_height):
 		self.valve_frequency = frequency
 		self.valve_duty_cycle = duty_cycle
 		self.layer_height = layer_height
-		self.wait_time = wait_time
 
 		previous_line = ''
 
@@ -89,12 +88,12 @@ class gcp:
 					print(f"[Line {self.current_line_nr}] ERROR: line after line before ';LAYER:' is not ;TIME_ELAPSED: but {line.strip()}")
 				print(f"[Line {self.current_line_nr}] Found {line.strip()}, prepending homing&pausing")
 				self.proc_text.append(f"""
-;deposit one layer of 4 mm
+;deposit one layer of {self.layer_height:,.1f} mm
 G1 F7200 Y365   ; move Y axis out of the way
 M577 E1 S0; wait for endstop_1 turn low\n
 
 G91       ;enable relative motion
-G1 Z4.0   ;move bed down
+G1 Z{self.layer_height:,.1f}   ;move bed down
 
 G90       ;absolute positioning
 G1 F3000 U350   ;deposit material

@@ -29,12 +29,4 @@ print()
 
 h.show_report()
 
-print()
-print("Done.")
-print()
-print("WARNING: STOPPING THE VALVE AT END OF PROGRAM NOT YET IMPLEMENTED")
-print("DON'T FORGET TO MANUALLY ADD 'M42 P21 S0;stop the valve' AT THE ")
-print("END OF THE FILE!")
-print()
-
 input("Press enter to continue...")
