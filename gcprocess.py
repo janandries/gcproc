@@ -80,6 +80,8 @@ class gcp:
 
 			#ADD HOMING AND PAUSE AFTER EACH LAYER
 			if line.startswith(';LAYER:'):
+				#recall the last string which contains a G0 move to where we were
+				last_g_code_command = self.proc_text[-2] #this line should be the original G0 move
 				self.current_layer_index += 1
 				
 				time_elapse = self.proc_text[-1]
@@ -101,6 +103,8 @@ G1 F3000 U0     ;scrape and return
 """)
 
 				self.c_home_pause_after_layer += 1
+				
+				self.proc_text.append(last_g_code_command)
 
 				self.proc_text.append(line)
 
@@ -142,9 +146,9 @@ G1 F3000 U0     ;scrape and return
 	def get_initial_settings_string(self, frequency, duty_cycle):
 		string = f"""M563 P1 D1 ;H0 ; tool 1 uses extruder 0, heater 0 (and fan 0)
 T1 ;select tool 1
-M302 P1 ;enable the cold extrusion
+M302 P1 ;enable the cold extrusion (we don't care about temperatures!)
 
 M106 P1 I-1 ;disable FAN1 signal
-M571 P21 F{frequency:.0f} S{duty_cycle:.1f} ;is the command to set the fan with the extruder"""
+M571 P21 F{frequency} S{duty_cycle:,.1f} ; set the fan1 with the extruder"""
 		return string
 
