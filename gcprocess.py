@@ -81,11 +81,9 @@ class gcp:
 
 			#ADD HOMING AND PAUSE AFTER EACH LAYER
 			if line.startswith(';LAYER:'):
-<<<<<<< HEAD
 				#recall the last string which contains a G0 move to where we were
 				last_g_code_command = self.proc_text[-2] #this line should be the original G0 move
-=======
->>>>>>> 4a356ee41eba0e13d7241b0ffb8ed3560f21a092
+
 				self.current_layer_index += 1
 				
 				time_elapse = self.proc_text[-1]
@@ -93,7 +91,7 @@ class gcp:
 					#something is wrong here?
 					print(f"[Line {self.current_line_nr}] ERROR: line after line before ';LAYER:' is not ;TIME_ELAPSED: but {line.strip()}")
 				print(f"[Line {self.current_line_nr}] Found {line.strip()}, prepending homing&pausing")
-<<<<<<< HEAD
+
 				half_layer = self.layer_height / 2
 				self.proc_text.append(f"""
 ;deposit one layer of {self.layer_height:,.1f} mm
@@ -113,25 +111,8 @@ G1 F3000 U32     ;scrape and return
 				self.c_home_pause_after_layer += 1
 				
 				self.proc_text.append(last_g_code_command)
-=======
-				self.proc_text.append(f"""
-;deposit one layer of 4 mm
-G1 F7200 Y365   ; move Y axis out of the way
-M577 E1 S0; wait for endstop_1 turn low\n
-
-G91       ;enable relative motion
-G1 Z4.0   ;move bed down
-
-G90       ;absolute positioning
-G1 F3000 U350   ;deposit material
-G1 F3000 U0     ;scrape and return
-""")
-
-				self.c_home_pause_after_layer += 1
->>>>>>> 4a356ee41eba0e13d7241b0ffb8ed3560f21a092
 
 				self.proc_text.append(line)
-
 				previous_line = line
 				continue
 
@@ -170,11 +151,7 @@ G1 F3000 U0     ;scrape and return
 	def get_initial_settings_string(self, frequency, duty_cycle):
 		string = f"""M563 P1 D1 ;H0 ; tool 1 uses extruder 0, heater 0 (and fan 0)
 T1 ;select tool 1
-<<<<<<< HEAD
 M302 P1 ;enable the cold extrusion (we don't care about temperatures!)
-=======
-M302 P1 ;enable the cold extrusion
->>>>>>> 4a356ee41eba0e13d7241b0ffb8ed3560f21a092
 
 M106 P1 I-1 ;disable FAN1 signal
 M571 P21 F{frequency} S{duty_cycle:,.1f} ; set the fan1 with the extruder"""
