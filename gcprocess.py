@@ -38,11 +38,10 @@ class gcp:
 			for line in self.proc_text:
 				f.write("%s" % line)
 
-	def process(self, frequency, duty_cycle, layer_height, wait_time):
+	def process(self, frequency, duty_cycle, layer_height):
 		self.valve_frequency = frequency
 		self.valve_duty_cycle = duty_cycle
 		self.layer_height = layer_height
-		self.wait_time = wait_time
 
 		previous_line = ''
 
@@ -154,7 +153,7 @@ T1 ;select tool 1
 M302 P1 ;enable the cold extrusion (we don't care about temperatures!)
 
 M106 P1 I-1 ;disable FAN1 signal
-M571 P21 F{frequency} S{duty_cycle:,.1f} ; set the fan1 with the extruder"""
+M571 P21 F{frequency} S{duty_cycle:,.2f} ; set the fan1 with the extruder
 
 ;deposit initial layer of 3 mm
 G1 F7200 Y365   ;move Y axis out of the way
@@ -167,6 +166,6 @@ G1 F3000 U322           ;deposit material
 G91                     ;enable relative motion
 G1 Z1.5   ;move bed down half a layer
 G90       ;absolute positioning
-G1 F3000 U32     ;scrape and return
+G1 F3000 U32     ;scrape and return"""
 		return string
 
