@@ -19,7 +19,7 @@ print(f"Selected file: {file_path}")
 print()
 frequency = int(input("Enter valve frequency [Hz]: "))
 duty_cycle = float(input("Enter valve duty cycle [0-1]: "))
-layer_height = int(input("Enter layer height [mm]: "))
+layer_height = float(input("Enter layer height [mm]: "))
 
 h.process(frequency, duty_cycle, layer_height)
 

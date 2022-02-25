@@ -89,17 +89,20 @@ class gcp:
 					#something is wrong here?
 					print(f"[Line {self.current_line_nr}] ERROR: line after line before ';LAYER:' is not ;TIME_ELAPSED: but {line.strip()}")
 				print(f"[Line {self.current_line_nr}] Found {line.strip()}, prepending homing&pausing")
+				half_layer = self.layer_height / 2
 				self.proc_text.append(f"""
 ;deposit one layer of {self.layer_height:,.1f} mm
-G1 F7200 Y365   ; move Y axis out of the way
-M577 E1 S0; wait for endstop_1 turn low\n
-
-G91       ;enable relative motion
-G1 Z{self.layer_height:,.1f}   ;move bed down
-
+G1 F7200 Y365   ;move Y axis out of the way
+G1 F3000 U32     ;move to begin position
+G91                     ;enable relative motion
+G1 Z{half_layer:,.2f}   ;move bed down half a layer
+G90                     ;absolute positioning
+M577 E1 S0              ;wait for endstop_1 turn low
+G1 F3000 U322           ;deposit material
+G91                     ;enable relative motion
+G1 Z{half_layer:,.2f}   ;move bed down half a layer
 G90       ;absolute positioning
-G1 F3000 U350   ;deposit material
-G1 F3000 U0     ;scrape and return
+G1 F3000 U32     ;scrape and return
 """)
 
 				self.c_home_pause_after_layer += 1
@@ -150,5 +153,18 @@ M302 P1 ;enable the cold extrusion (we don't care about temperatures!)
 
 M106 P1 I-1 ;disable FAN1 signal
 M571 P21 F{frequency} S{duty_cycle:,.1f} ; set the fan1 with the extruder"""
+
+;deposit initial layer of 3 mm
+G1 F7200 Y365   ;move Y axis out of the way
+G1 F3000 U32     ;move to begin position
+G91                     ;enable relative motion
+G1 Z1.5   ;move bed down half a layer
+G90                     ;absolute positioning
+M577 E1 S0              ;wait for endstop_1 turn low\n
+G1 F3000 U322           ;deposit material
+G91                     ;enable relative motion
+G1 Z1.5   ;move bed down half a layer
+G90       ;absolute positioning
+G1 F3000 U32     ;scrape and return
 		return string
 
