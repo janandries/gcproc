@@ -20,8 +20,10 @@ print()
 frequency = int(input("Enter valve frequency [Hz]: "))
 duty_cycle = float(input("Enter valve duty cycle [0-1]: "))
 layer_height = float(input("Enter layer height [mm]: "))
+initial_layer_height = float(input("Enter INITIAL layer height [mm]: "))
+use_half_layers = int(input("Deposit in one direction (1) or in both directions (2)?: "))
 
-h.process(frequency, duty_cycle, layer_height)
+h.process(frequency, duty_cycle, layer_height, initial_layer_height, use_half_layers==2)
 
 h.save_to_file(file_path + '.output')
 
