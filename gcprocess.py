@@ -1,4 +1,14 @@
+from dataclasses import dataclass
 
+@dataclass
+class MachineDefinition:
+    u_load : int
+    u_return : int
+    y_safe : int
+
+#here a profile should be loaded
+#md = MachineDefinition(10, 304, 0)   #Idefix_25
+md = MachineDefinition(10, 201, 100) #Idefix_15
 
 class gcp:
 	def __init__(self):
@@ -100,8 +110,8 @@ class gcp:
 				half_layer = self.layer_height / 2
 				self.proc_text.append(f"""
 ;deposit one layer of {self.layer_height:,.1f} mm
-G1 F7200 Y0   ;move Y axis out of the way
-G1 F3000 U10     ;move to begin position""")
+G1 F7200 Y{md.y_safe}   ;move Y axis out of the way
+G1 F3000 U{md.u_load}     ;move to begin position""")
 				if self.use_half_layers:
 					self.proc_text.append(f"""
 G91                     ;enable relative motion
@@ -115,7 +125,7 @@ G90                     ;absolute positioning""")
 				self.proc_text.append(f"""
 G4 S1     ; wait one second to prevent it from continuing directly
 M577 E1 S0              ;wait for endstop_1 turn low
-G1 F3000 U304           ;deposit material""")
+G1 F3000 U{md.u_return}           ;deposit material""")
 
 				if self.use_half_layers:
 					self.proc_text.append(f"""
@@ -124,7 +134,7 @@ G1 Z{half_layer:,.2f}   ;move bed down half a layer
 G90       ;absolute positioning""")
 
 				self.proc_text.append(f"""
-G1 F3000 U10     ;scrape and return
+G1 F3000 U{md.u_load}     ;scrape and return
 
 """)
 
@@ -180,32 +190,32 @@ M571 P21 F{frequency} S{duty_cycle:,.2f} ; set the fan1 with the extruder"""
 		if use_half_layers:
 			string = (f"""{string}
 ;deposit initial layer of 3 mm
-G1 F7200 Y0   ;move Y axis out of the way
-G1 F3000 U10     ;move to begin position
+G1 F7200 Y{md.y_safe}   ;move Y axis out of the way
+G1 F3000 U{md.u_load}     ;move to begin position
 G91                     ;enable relative motion
 G0 Z{initial_layer_thickness/2:,.2f}   ;move bed down half a layer
 G90                     ;absolute positioning
 G4 S1     ; wait one second to prevent it from continuing directly
 M577 E1 S0              ;wait for endstop_1 turn low\n
-G1 F3000 U304           ;deposit material
+G1 F3000 U{md.u_return}           ;deposit material
 G91                     ;enable relative motion
 G1 Z{initial_layer_thickness/2:,.2f}   ;move bed down half a layer
 G90       ;absolute positioning
-G1 F3000 U10     ;scrape and return
+G1 F3000 U{md.u_load}     ;scrape and return
 
 """)
 		else:
 			string = (f"""{string}
 ;deposit initial layer of 3 mm
-G1 F7200 Y0   ;move Y axis out of the way
-G1 F3000 U10     ;move to begin position
+G1 F7200 Y{md.y_safe}   ;move Y axis out of the way
+G1 F3000 U{md.u_load}     ;move to begin position
 G91                     ;enable relative motion
 G0 Z{initial_layer_thickness:,.2f}                 ;move bed down initial layer
 G90                     ;absolute positioning
 G4 S1     ; wait one second to prevent it from continuing directly
 M577 E1 S0              ;wait for endstop_1 turn low\n
-G1 F3000 U304           ;deposit material
-G1 F3000 U10            ;scrape and return
+G1 F3000 U{md.u_return}           ;deposit material
+G1 F3000 U{md.u_load}            ;scrape and return
 
 """)
 
