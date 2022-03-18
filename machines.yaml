@@ -1,0 +1,9 @@
+idefix_15:
+    u_load : 10
+    u_return : 201
+    y_safe : 100
+    
+idefix_25:
+    u_load : 10
+    u_return : 304
+    y_safe : 0
