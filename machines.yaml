@@ -4,6 +4,27 @@ idefix_15:
     y_safe : 100
     
 idefix_25:
+# where the nozzle is exactly over the (0,0) corner of the box
+# program this offset with a minus sign in Cura as nozzle offset
+    box_zero_x: 10   
+    box_zero_y: 59   
     u_load : 10
-    u_return : 304
+    u_return : 300
     y_safe : 0
+   
+idefix_25_staiger:
+# where the nozzle is exactly over the (0,0) corner of the box
+# program this offset with a minus sign in Cura as nozzle offset
+    box_zero_x: 25   
+    box_zero_y: 54   
+    box_max_x: 272
+    box_max_y: 285
+    u_load : 10
+    u_return : 300
+    y_safe : 0
+    
+idefix_in_box:
+    u_load: 5
+    u_return: 187
+    y_safe: 0
+    
