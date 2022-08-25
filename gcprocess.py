@@ -185,12 +185,12 @@ G1 F3000 U{self.md.u_load}     ;scrape and return
 T1 ;select tool 1
 M302 P1 ;enable the cold extrusion (we don't care about temperatures!)
 
-M106 P1 I-1 ;disable FAN1 signal
-M571 P21 F{frequency} S{duty_cycle:,.2f} ; set the fan1 with the extruder"""
+; set the heater pins as output pins for the G1 Px command
+M670 T0 C"exp.heater3+exp.heater4+exp.heater5"\n\n"""
 
 		if use_half_layers:
 			string = (f"""{string}
-;deposit initial layer of 3 mm
+;deposit initial layer of {initial_layer_thickness:,.1f} mm
 G1 F7200 Y{self.md.y_safe}   ;move Y axis out of the way
 G1 F3000 U{self.md.u_load}     ;move to begin position
 G91                     ;enable relative motion
@@ -207,7 +207,7 @@ G1 F3000 U{self.md.u_load}     ;scrape and return
 """)
 		else:
 			string = (f"""{string}
-;deposit initial layer of 3 mm
+;deposit initial layer of {initial_layer_thickness:,.1f} mm
 G1 F7200 Y{self.md.y_safe}   ;move Y axis out of the way
 G1 F3000 U{self.md.u_load}     ;move to begin position
 G91                     ;enable relative motion
