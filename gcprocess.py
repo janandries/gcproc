@@ -125,7 +125,7 @@ G1 Z{self.layer_height:,.2f}   ;move bed down one thickness
 G90                     ;absolute positioning""")
 				self.proc_text.append(f"""
 G4 S1     ; wait one second to prevent it from continuing directly
-M577 E1 S0              ;wait for endstop_1 turn low
+M577 P0 S0              ;wait for endstop_1 turn low
 G1 F3000 U{self.md.u_return}           ;deposit material""")
 
 				if self.use_half_layers:
@@ -197,7 +197,7 @@ G91                     ;enable relative motion
 G0 Z{initial_layer_thickness/2:,.2f}   ;move bed down half a layer
 G90                     ;absolute positioning
 G4 S1     ; wait one second to prevent it from continuing directly
-M577 E1 S0              ;wait for endstop_1 turn low\n
+M577 P0 S0              ;wait for endstop_1 turn low\n
 G1 F3000 U{self.md.u_return}           ;deposit material
 G91                     ;enable relative motion
 G1 Z{initial_layer_thickness/2:,.2f}   ;move bed down half a layer
@@ -214,7 +214,7 @@ G91                     ;enable relative motion
 G0 Z{initial_layer_thickness:,.2f}                 ;move bed down initial layer
 G90                     ;absolute positioning
 G4 S1     ; wait one second to prevent it from continuing directly
-M577 E1 S0              ;wait for endstop_1 turn low\n
+M577 P0 S0              ;wait for endstop_1 turn low\n
 G1 F3000 U{self.md.u_return}           ;deposit material
 G1 F3000 U{self.md.u_load}            ;scrape and return
 
