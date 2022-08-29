@@ -56,10 +56,11 @@ class gcp:
             for line in self.proc_text:
                 f.write("%s" % line)
 
-    def process(self, frequency, duty_cycle, layer_height, initial_layer_height, use_half_layers, machine):
+    def process(self, frequency, duty_cycle, feed_rate, layer_height, initial_layer_height, use_half_layers, machine):
         self.FIRST_MESH_PROCESSED = False
         self.valve_frequency = frequency
         self.valve_duty_cycle = duty_cycle
+        self.feed_rate = feed_rate
         self.layer_height = layer_height
         self.initial_layer_height = initial_layer_height
         self.use_half_layers = use_half_layers
@@ -194,7 +195,7 @@ G1 F3000 U{self.md.u_load}     ;scrape and return
         # now we replace all mention of E with P1:
         self.proc_text = self.replace_e_for_p1(self.proc_text)
         self.proc_text = self.append_p0_to_g0(self.proc_text)
-        self.proc_text = self.replace_all_g0_g1_x_y_speeds(self.proc_text, 5000)
+        self.proc_text = self.replace_all_g0_g1_x_y_speeds(self.proc_text, self.feed_rate)
 
     def replace_e_for_p1(self, text):
         print("replacing all Ex.xx for P1")

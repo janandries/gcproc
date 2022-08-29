@@ -39,6 +39,7 @@ print(f"Selected file: {file_path}")
 print()
 frequency = int(input("Enter valve frequency [Hz]: "))
 duty_cycle = float(input("Enter valve duty cycle [0-1]: "))
+feed_rate = int(input("Enter desired feed rate [mm/min]: "))
 layer_height = float(input("Enter layer height [mm]: "))
 initial_layer_height = float(input("Enter INITIAL layer height [mm]: "))
 use_half_layers = int(input("Deposit in one direction (1) or in both directions (2)?: "))
@@ -51,7 +52,7 @@ for count, (key, value) in enumerate(machines.items(), 1):
 machine_idx = int(input())
 machine = machines[key_at_index(machines, machine_idx-1)]
 
-h.process(frequency, duty_cycle, layer_height, initial_layer_height, use_half_layers==2, machine)
+h.process(frequency, duty_cycle, feed_rate, layer_height, initial_layer_height, use_half_layers==2, machine)
 
 h.show_report()
 
