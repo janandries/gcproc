@@ -176,9 +176,9 @@ G1 F3000 U{self.md.u_load}     ;scrape and return
                 continue
 
             # stop the valve at the end of the program
-            if line.startswith(';M104 S0'):  # ';M104 S0' somehow is always used at the end before homing'
+            if line.startswith('M82 ;absolute extrusion mode') and len(self.proc_text) > 15: # also occurs in the beginning, we ignore that one
+                self.proc_text.append("G0 X0 Y0\n") # we just add a G0 command to go to zero. A 'P0' will be added later
                 self.proc_text.append(line)
-                self.proc_text.append("M42 P21 S0;stop the valve\n")
                 self.c_valve_stop += 1
 
                 previous_line = line
