@@ -216,9 +216,7 @@ G1 F3000 U{self.md.u_load}     ;scrape and return
         return apply_substitution(text, source, target)
 
     def get_initial_settings_string(self, frequency, duty_cycle, initial_layer_thickness, use_half_layers):
-        string = f"""M563 P1 D1 ;H0 ; tool 1 uses extruder 0, heater 0 (and fan 0)
-T1 ;select tool 1
-M302 P1 ;enable the cold extrusion (we don't care about temperatures!)
+        string = f"""M302 P1 ;enable the cold extrusion (we don't care about temperatures!)
 
 ; set the heater pins as output pins for the G1 Px command
 M670 T0 C"exp.heater3+exp.heater4+exp.heater5"\n\n"""
