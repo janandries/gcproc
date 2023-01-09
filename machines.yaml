@@ -26,11 +26,12 @@ idefix_25_staiger:
 idebroken_25_staiger:
 # where the nozzle is exactly over the (0,0) corner of the box
 # program this offset with a minus sign in Cura as nozzle offset
-    box_zero_x: 0
-    box_zero_y: 63   
-    box_max_x: 244
-    box_max_y: 290
-    u_load : 10
+# (actually we now compensate for it in the code, no need to do it in cura)
+    box_zero_x: 10
+    box_zero_y: 76
+    box_max_x: 222 #this now indicates the box width, not the absolute max X position! 
+    box_max_y: 217 #TODO, change the name of these two variables to box_width / box_depth
+    u_load : 15
     u_return : 300
     y_safe : 0
     

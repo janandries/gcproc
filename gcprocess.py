@@ -6,6 +6,8 @@ class MachineDefinition:
     u_load: int
     u_return: int
     y_safe: int
+    x_offset: int
+    y_offset: int
 
 
 """
@@ -64,7 +66,7 @@ class gcp:
         self.layer_height = layer_height
         self.initial_layer_height = initial_layer_height
         self.use_half_layers = use_half_layers
-        self.md = MachineDefinition(machine['u_load'], machine['u_return'], machine['y_safe'])  # Idefix_15
+        self.md = MachineDefinition(machine['u_load'], machine['u_return'], machine['y_safe']-machine['box_zero_y'], machine['box_zero_x'], machine['box_zero_y'])
 
         previous_line = ''
 
@@ -219,7 +221,9 @@ G1 F3000 U{self.md.u_load}     ;scrape and return
         string = f"""M302 P1 ;enable the cold extrusion (we don't care about temperatures!)
 
 ; set the heater pins as output pins for the G1 Px command
-M670 T0 C"exp.heater3+exp.heater4+exp.heater5"\n\n"""
+M670 T0 C"exp.heater3+exp.heater4+exp.heater5"\n
+
+M10 L2 X{self.md.x_offset} Y{self.md.y_offset} Z0.0 # set the 0,0 coordinate to the corner of the box\n\n"""
 
         if use_half_layers:
             string = (f"""{string}
