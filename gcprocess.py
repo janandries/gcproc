@@ -58,7 +58,7 @@ class gcp:
             for line in self.proc_text:
                 f.write("%s" % line)
 
-    def process(self, frequency, duty_cycle, feed_rate, layer_height, initial_layer_height, use_half_layers, machine):
+    def process(self, frequency, duty_cycle, feed_rate, layer_height, initial_layer_height, use_half_layers, machine, gcode=""):
         self.FIRST_MESH_PROCESSED = False
         self.valve_frequency = frequency
         self.valve_duty_cycle = duty_cycle
@@ -75,7 +75,11 @@ class gcp:
         # ignore commands:
         ignore_list = ('M104', 'M105', 'M107', 'M109')
 
-        lines = self.file.readlines()
+		if gcode not "":
+			lines = self.file.readlines()
+		else:
+			lines = gcode.split('\n')
+
         self.current_line_nr = 0
         self.current_layer_index = 0
         for line in lines:
