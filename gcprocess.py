@@ -222,13 +222,8 @@ G1 F3000 U{self.md.u_load}     ;scrape and return
         return apply_substitution(text, source, target)
 
     def get_initial_settings_string(self, frequency, duty_cycle, initial_layer_thickness, use_half_layers):
-        string = f"""M302 P1 ;enable the cold extrusion (we don't care about temperatures!)
-
-; set the heater pins as output pins for the G1 Px command
-M670 T0 C"exp.heater3+exp.heater4+exp.heater5"\n
-
-M10 L2 X{self.md.x_offset} Y{self.md.y_offset} Z0.0 # set the 0,0 coordinate to the corner of the box\n\n"""
-
+        string = f"""M98 P"PREPRINT_CONFIGURE"\n\n"""
+        
         if use_half_layers:
             string = (f"""{string}
 ;deposit initial layer of {initial_layer_thickness:,.1f} mm
