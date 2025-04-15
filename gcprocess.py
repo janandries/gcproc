@@ -75,10 +75,10 @@ class gcp:
         # ignore commands:
         ignore_list = ('M104', 'M105', 'M107', 'M109')
 
-		if gcode not "":
-			lines = self.file.readlines()
-		else:
-			lines = gcode.split('\n')
+        if gcode != "":
+            lines = self.file.readlines()
+        else:
+            lines = gcode.split('\n')
 
         self.current_line_nr = 0
         self.current_layer_index = 0
